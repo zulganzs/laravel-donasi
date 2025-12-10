@@ -264,8 +264,16 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach ($blog as $item)
-                    <div class="flex flex-col bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300">
-                        <div class="p-6 flex-1 flex flex-col">
+                    <div class="flex flex-col bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group">
+                        <div class="h-48 overflow-hidden relative">
+                        <img 
+                            src="{{ $item->gambar_blog ? asset('/storage/images/thumbnail/' . $item->gambar_blog) : 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80' }}" 
+                            alt="{{ $item->judul_blog }}" 
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80';"
+                        >
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col">
                             <h5 class="text-xl font-bold mb-3">
                                 <a href="/blog/{{ $item->slug_blog }}" class="text-gray-900 hover:text-primary-600 transition-colors line-clamp-2">
                                     {{ $item->judul_blog }}

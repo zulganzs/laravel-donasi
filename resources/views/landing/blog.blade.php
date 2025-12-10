@@ -19,7 +19,12 @@
     @if($featured)
     <div class="relative w-full h-[500px] rounded-3xl overflow-hidden mb-12 group">
         <div class="absolute inset-0">
-            <img src="{{ asset('/storage/images/thumbnail/' . $featured->gambar_blog) }}" alt="{{ $featured->judul_blog }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+            <img 
+                src="{{ $featured->gambar_blog ? asset('/storage/images/thumbnail/' . $featured->gambar_blog) : 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80' }}" 
+                alt="{{ $featured->judul_blog }}" 
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80';"
+            >
             <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent opacity-90"></div>
         </div>
         
@@ -85,7 +90,12 @@
             <!-- Article Card -->
             <article class="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group h-full flex flex-col">
                 <div class="h-56 bg-gray-200 overflow-hidden relative">
-                    <img src="{{ asset('/storage/images/thumbnail/' . $item->gambar_blog) }}" alt="{{ $item->judul_blog }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <img 
+                        src="{{ $item->gambar_blog ? asset('/storage/images/thumbnail/' . $item->gambar_blog) : 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80' }}" 
+                        alt="{{ $item->judul_blog }}" 
+                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80';"
+                    >
                     <div class="absolute top-4 left-4">
                         <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide {{ $catColor }} backdrop-blur-sm bg-opacity-90">
                             {{ $category }}

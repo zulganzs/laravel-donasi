@@ -125,13 +125,18 @@
             @foreach($latest_blogs as $blog)
             <article class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all group">
                 <div class="h-32 bg-gray-200 overflow-hidden">
-                    <img src="/images/{{ $blog->gambar_artikel }}" alt="{{ $blog->judul_artikel }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    <img 
+                    src="{{ $blog->gambar_blog ? asset('storage/images/thumbnail/' . $blog->gambar_blog) : 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80' }}" 
+                    alt="{{ $blog->judul_blog ?? 'Artikel PeduliSesama' }}" 
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80';"
+                >
                 </div>
                 <div class="p-4">
                     <span class="text-xs font-semibold text-primary-600 mb-2 block">Artikel</span>
-                    <h3 class="font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">{{ $blog->judul_artikel }}</h3>
-                    <p class="text-gray-500 text-xs mb-3 line-clamp-2">{{ strip_tags($blog->deskripsi_artikel) }}</p>
-                    <a href="{{ url('/blog/'.$blog->slug) }}" class="text-sm font-medium text-primary-600 hover:text-primary-700">Baca Selengkapnya &rarr;</a>
+                    <h3 class="font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">{{ $blog->judul_blog }}</h3>
+                    <p class="text-gray-500 text-xs mb-3 line-clamp-2">{{ strip_tags($blog->isi_blog) }}</p>
+                    <a href="{{ url('/blog/'.$blog->slug_blog) }}" class="text-sm font-medium text-primary-600 hover:text-primary-700">Baca Selengkapnya &rarr;</a>
                 </div>
             </article>
             @endforeach
