@@ -35,10 +35,14 @@ Route::get('/cari', [LandingController::class, 'cari'])->name('cari');
 // Route::get('/dashboard-ui', function () {
 //     return view('dashboard.index');
 // });
-Route::post('/logout', [DashboardController::class, "logout"]);
+Route::post('/logout', [DashboardController::class, "logout"])->name('logout');
 /* Campaign */
-Route::get('/campaign/{slug}', [CampaignController::class, "index"]);
+Route::get('/campaign/{slug}/donate', [TransaksiController::class, "donateForm"])->name('donasi.form');
 Route::get('/campaign/{slug}/berita/{slugberita}', [CampaignController::class, "berita"]);
+Route::get('/campaign/{slug}', [CampaignController::class, "index"]);
+Route::get('/all-campaigns', [CampaignController::class, "allCampaigns"]);
+Route::post('/donasi/{id}', [TransaksiController::class, "create"])->name('donasi.store');
+Route::get('/checkout/{id}', [TransaksiController::class, "checkout"]);
 /* Kategori */
 Route::get('/kategori/{kategori}', [LandingController::class, "kategori"]);
 /* Blog */
@@ -78,6 +82,8 @@ Route::group(['middleware' => ['auth', 'role:0']], function () {
     Route::post('/admin/pegawai/hapus-pegawai', [PegawaiController::class, "deletepegawai"]);
     /* Admin Campaign */
     Route::get('/admin/campaign/campaign', [CampaignController::class, "campaign"]);
+    Route::get('/admin/campaign/campaign/create', [CampaignController::class, "create"])->name('admin.campaign.create');
+    Route::post('/admin/campaign/campaign/store', [CampaignController::class, "store"])->name('admin.campaign.store');
     Route::post('/admin/campaign/campaign/edit-status-campaign', [CampaignController::class, "editstatuscampaign"]);
     Route::get('/admin/campaign/campaign/lihat/{id}', [CampaignController::class, "lihatcampaign"]);
     Route::get('/admin/campaign/berita', [CampaignController::class, "news"]);
@@ -119,8 +125,8 @@ Route::group(['middleware' => ['auth', 'role:1,2']], function () {
     Route::post('/profil-update', [DashboardController::class, "updateprofileuser"]);
     Route::post('/password-update', [DashboardController::class, "updatepassworduser"]);
     /* Transaksi Donasi */
-    Route::post('/donasi', [TransaksiController::class, "create"]);
-    Route::get('/checkout/{id}', [TransaksiController::class, "checkout"]);
+
+
     
     /* User Dashboard */
     Route::get('/dashboard', [DashboardController::class, "userDashboard"])->name('dashboard');

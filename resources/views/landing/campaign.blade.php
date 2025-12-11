@@ -3,6 +3,16 @@
     <section class="py-12 bg-gray-50 min-h-screen">
         <div class="container mx-auto px-4 max-w-5xl">
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                @if(session('success'))
+                    <div class="flex items-center p-4 mb-4 text-green-800 rounded-xl bg-green-50 border border-green-200 mx-6 mt-6" role="alert">
+                        <svg class="flex-shrink-0 w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div class="text-sm font-medium">
+                            {{ session('success') }}
+                        </div>
+                    </div>
+                @endif
                 <!-- Banner Image -->
                 <div class="relative h-64 md:h-96 w-full">
                     <img src="{{ asset('/storage/' . $campaign->foto_campaign) }}" class="w-full h-full object-cover"
@@ -21,18 +31,26 @@
                     
                     <hr class="border-gray-100 my-8">
                     
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="bg-teal-600 h-3 rounded-full transition-all duration-500 ease-out" 
+                                style="width: {{ ($campaign->dana_terkumpul / $campaign->target_campaign) * 100 }}%"></div>
+                        </div>
+                    </div>
+                    
                     <!-- Stats Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 bg-gray-50 rounded-2xl p-6 border border-gray-100">
                         <div class="text-center md:text-left">
                             <p class="text-sm text-gray-500 mb-1">Dana Terkumpul</p>
                             <p class="text-2xl font-bold text-primary-600">
-                                Rp{{ number_format($campaign->dana_terkumpul, 2, ',', '.') }}
+                                Rp {{ number_format($campaign->dana_terkumpul, 0, ',', '.') }}
                             </p>
                         </div>
                         <div class="text-center md:text-left">
                             <p class="text-sm text-gray-500 mb-1">Target Dana</p>
                             <p class="text-2xl font-bold text-gray-800">
-                                Rp{{ number_format($campaign->target_campaign, 2, ',', '.') }}
+                                Rp {{ number_format($campaign->target_campaign, 0, ',', '.') }}
                             </p>
                         </div>
                         <div class="text-center md:text-left">
@@ -43,12 +61,81 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-start mb-10">
-                         <button data-bs-toggle="modal"
-                            @auth data-bs-target="#create" @else data-bs-target="#create" @endif 
-                            class="w-full md:w-auto px-8 py-4 rounded-full bg-primary-600 text-white font-bold text-lg hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/30 transform hover:-translate-y-1">
-                            Donasi Sekarang
-                        </button>
+<div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 mb-10" id="donation-form">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Formulir Donasi</h3>
+                        <form action="{{ route('donasi.store', $campaign->id) }}" method="POST" class="space-y-6">
+                            @csrf
+                            
+                            <!-- Donation Amount -->
+                            <div>
+                                <label class="text-sm font-semibold text-gray-700 mb-2 block">Masukan Nominal Donasi</label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">Rp</span>
+                                    <input type="number" name="nominal" 
+                                        class="w-full pl-12 pr-4 py-4 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-4 focus:ring-teal-50 text-xl font-bold text-gray-800 transition-all placeholder-gray-300"
+                                        placeholder="Min. 10.000" required min="10000">
+                                </div>
+                                <p class="text-xs text-gray-400 mt-2">*Minimal donasi Rp 10.000</p>
+                            </div>
+
+                            <!-- Donor Information -->
+                            <div class="space-y-4">
+                                <label class="text-sm font-semibold text-gray-700 block">Informasi Donatur</label>
+                                @auth
+                                    <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0d9488&color=fff" class="w-10 h-10 rounded-full">
+                                            <div>
+                                                <p class="font-semibold text-gray-900">{{ Auth::user()->name }}</p>
+                                                <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="nama" value="{{ Auth::user()->name }}">
+                                    <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
+                                @else
+                                    <div class="grid grid-cols-1 gap-4">
+                                        <input type="text" name="nama" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-teal-100" placeholder="Nama Lengkap" required>
+                                        <input type="email" name="email" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-teal-100" placeholder="Email (Opsional)">
+                                    </div>
+                                @endauth
+
+                                <div class="flex items-center gap-3 pt-1">
+                                    <input type="checkbox" name="anonim" id="anonim" class="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500">
+                                    <label for="anonim" class="text-sm text-gray-600 cursor-pointer select-none">Sembunyikan nama saya (Hamba Allah)</label>
+                                </div>
+                            </div>
+
+                            <!-- Payment Method -->
+                            <div>
+                                <label class="text-sm font-semibold text-gray-700 mb-3 block">Metode Pembayaran</label>
+                                <div class="space-y-3">
+                                    <label class="flex items-center p-4 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-teal-500 has-[:checked]:bg-teal-50">
+                                        <input type="radio" name="payment_method" value="bank_transfer" class="w-4 h-4 text-teal-600 border-gray-300 focus:ring-teal-500" checked>
+                                        <span class="ml-3 font-medium text-gray-700">Transfer Bank</span>
+                                    </label>
+                                    <label class="flex items-center p-4 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-teal-500 has-[:checked]:bg-teal-50">
+                                        <input type="radio" name="payment_method" value="ewallet" class="w-4 h-4 text-teal-600 border-gray-300 focus:ring-teal-500">
+                                        <span class="ml-3 font-medium text-gray-700">E-Wallet</span>
+                                    </label>
+                                    <label class="flex items-center p-4 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-teal-500 has-[:checked]:bg-teal-50">
+                                        <input type="radio" name="payment_method" value="qris" class="w-4 h-4 text-teal-600 border-gray-300 focus:ring-teal-500">
+                                        <span class="ml-3 font-medium text-gray-700">QRIS</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Support Message -->
+                            <div>
+                                <label class="text-sm font-semibold text-gray-700 mb-2 block">Dukungan & Doa</label>
+                                <textarea name="pesan" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-teal-500 focus:ring-teal-100 placeholder-gray-400" placeholder="Tuliskan doa atau dukungan Anda..."></textarea>
+                            </div>
+
+                            <button type="submit" class="block w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-teal-500/30 transition-all transform hover:-translate-y-1 text-lg mt-6 relative z-10">
+                                Lanjutkan Pembayaran
+                            </button>
+                            <p class="text-center text-xs text-gray-400">Pembayaran aman & terverifikasi oleh Midtrans</p>
+                        </form>
                     </div>
 
                     <hr class="border-gray-100 my-8">
@@ -106,134 +193,4 @@
     </section>
 
 
-    <div class="modal fade" id="create" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content rounded-2xl border-0 shadow-2xl overflow-hidden">
-                @auth
-                    <div class="modal-header border-b border-gray-100 px-6 py-4 bg-gray-50">
-                        <h1 class="modal-title fs-5 font-bold text-gray-800" id="staticBackdropLabel">Detail Donasi</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-6 md:p-8">
-                        <form id="donation-form" method="post" action="/donasi" class="space-y-5">
-                            @csrf
-                            <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
-                            <input type="hidden" name="campaign_id" value="{{ $campaign->id }}">
-                                    
-                            <div class="form-group">
-                                <label for="nama" class="block text-sm font-medium text-gray-700 mb-1">Nama Donatur</label>
-                                <div class="flex gap-2">
-                                    <div class="relative flex-1">
-                                        <input type="text" id="nama" class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-600 focus:ring-0"
-                                            value="{{ Auth::user()->name }}" disabled>
-                                        <input type="hidden" name="nama" id="nama-hidden" value="{{ Auth::user()->name }}">
-                                    </div>
-                                    <button class="px-4 py-2 text-sm font-medium text-primary-600 bg-white border border-primary-200 rounded-xl hover:bg-primary-50 transition-colors"
-                                        onclick="toggleForm()" type="button">Ganti</button>
-                                </div>
-                                <script>
-                                    function toggleForm() {
-                                        var namaInput = document.getElementById("nama");
-                                        var namaHidden = document.getElementById("nama-hidden");
-                                        var anonimButton = document.querySelector("button[onclick='toggleForm()']"); // Select button specifically
-
-                                        if (namaInput.disabled) {
-                                            namaInput.disabled = false;
-                                            namaInput.value = "{{ __('Anonim') }}";
-                                            namaHidden.value = "Anonim"; 
-                                            // Make input editable to manual name if needed, or just set to Anonim?
-                                            // The original code set value to Anonim and enabled it? 
-                                            // Actually original code: namaInput.value = "Anonim", disabled=false.
-                                            // Let's stick to simple toggle logic:
-                                            // If displaying user name -> Switch to Anonim
-                                            // If displaying Anonim -> Switch to User Name
-                                            
-                                            // Re-reading original logic:
-                                            // It enabled the input and set value to Anonim, and allowed editing.
-                                            // Let's simplified it: Toggle between User Name and 'Anonim'. 
-                                            // If we want to allow custom names, we can leave enabled.
-                                            // But standard flow is usually User vs Anon.
-                                            
-                                            namaInput.value = "Anonim";
-                                            namaInput.classList.remove('bg-gray-100');
-                                            namaInput.classList.add('bg-white');
-                                            
-                                            // Trigger input event manually or set hidden directly
-                                            namaHidden.value = "Anonim";
-                                            
-                                            anonimButton.textContent = "Pakai Nama Asli";
-                                            anonimButton.classList.add('bg-primary-600', 'text-white');
-                                            anonimButton.classList.remove('bg-white', 'text-primary-600');
-                                        } else {
-                                            namaInput.disabled = true;
-                                            namaInput.value = "{{ Auth::user()->name }}";
-                                            namaHidden.value = "{{ Auth::user()->name }}";
-                                            namaInput.classList.add('bg-gray-100');
-                                            namaInput.classList.remove('bg-white');
-                                            
-                                            anonimButton.textContent = "Kirim Sebagai Anonim";
-                                            anonimButton.classList.remove('bg-primary-600', 'text-white');
-                                            anonimButton.classList.add('bg-white', 'text-primary-600');
-                                        }
-                                    }
-                                </script>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="nominal" class="block text-sm font-medium text-gray-700 mb-1">Jumlah Donasi</label>
-                                <div class="relative">
-                                    <input type="text" onkeyup="addCurrency(this)" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-lg font-bold text-gray-800" id="nominal" name="nominal" placeholder="Rp0" required>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="pesan" class="block text-sm font-medium text-gray-700 mb-1">Pesan / Do'a</label>
-                                <textarea name="pesan" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all h-32" required placeholder="Tuliskan doa atau dukungan Anda..."></textarea>
-                            </div>
-                            
-                            <div class="pt-4">
-                                <button type="submit" class="w-full py-4 rounded-full bg-primary-600 text-white font-bold text-lg hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30">Bayar Donasi</button>
-                            </div>
-                        </form>
-                    </div>
-                @else
-                    <div class="modal-content rounded-2xl border-0 shadow-2xl overflow-hidden">
-                        <div class="modal-header border-b border-gray-100 px-6 py-4">
-                            <h1 class="modal-title font-bold text-lg text-gray-800" id="staticBackdropLabel">Anda perlu login</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body px-6 py-8 text-center">
-                            <p class="text-gray-600 mb-6">Silahkan login terlebih dahulu untuk melanjutkan donasi.</p>
-                            <a class="inline-block px-8 py-3 rounded-full bg-primary-600 text-white font-bold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30"
-                                href="/login">Login Sekarang</a>
-                        </div>
-                    </div> 
-                @endauth
-            </div>
-        </div>
-    </div>
-@endsection
-@section('script')
-    <script>
-        function addCurrency(element) {
-            // Ambil nilai input
-            let value = element.value;
-
-            // Hapus karakter selain angka
-            value = value.replace(/[^\d]/g, '');
-
-            // Tambahkan "Rp." di depan nilai
-            // Handle if empty
-            if (value === "") {
-                element.value = "";
-                return;
-            }
-
-            value = "Rp" + value;
-
-            // Assign nilai yang sudah diubah kembali ke input
-            element.value = value;
-        }
-    </script>
 @endsection

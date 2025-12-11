@@ -75,4 +75,60 @@
         </a>
 
     </div>
+
+    <!-- User Profile Drop Up (Pinned Bottom) -->
+    <div class="border-t border-gray-100 p-4" x-data="{ open: false }">
+        <div class="relative">
+             <!-- Drop Up Menu -->
+            <div x-show="open" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-2"
+                 @click.away="open = false" 
+                 class="absolute bottom-full left-0 w-full mb-2 bg-white rounded-xl shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.1)] border border-gray-100 py-1 z-50">
+                
+                <div class="px-4 py-3 border-b border-gray-50 bg-gray-50/50 rounded-t-xl">
+                    <p class="text-sm font-medium text-gray-900">Halo, {{ Auth::user()->name }}</p>
+                    <p class="text-xs text-gray-400 truncate">{{ Auth::user()->email }}</p>
+                </div>
+                
+                <a href="{{ Auth::user()->level == 0 ? '/admin/profil' : '/profil' }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-teal-600">
+                    <i class="fa-solid fa-user mr-2 text-gray-400"></i> Profil Saya
+                </a>
+
+                <!-- Conditional History Link (Hidden for Admin) -->
+                @if(Auth::user()->level != 0)
+                <a href="/donasi-saya" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-teal-600">
+                    <i class="fa-solid fa-clock-rotate-left mr-2 text-gray-400"></i> Riwayat Donasi
+                </a>
+                @endif
+                
+                <div class="border-t border-gray-50 my-1"></div>
+                
+                <form action="/logout" method="post" class="block">
+                    @csrf
+                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                        <i class="fa-solid fa-sign-out-alt mr-2"></i> Keluar
+                    </button>
+                </form>
+            </div>
+
+            <!-- Trigger Button -->
+            <button @click="open = !open" class="flex items-center w-full gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors group focus:outline-none">
+                <div class="w-9 h-9 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 font-bold overflow-hidden flex-shrink-0 border border-teal-200">
+                     <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0d9488&color=fff" alt="User" class="w-full h-full object-cover">
+                </div>
+                <div class="flex-1 text-left overflow-hidden">
+                    <h6 class="text-sm font-semibold text-gray-700 truncate group-hover:text-teal-600 transition-colors">{{ Auth::user()->name }}</h6>
+                    <p class="text-xs text-gray-500 truncate">
+                        {{ Auth::user()->level == 0 ? 'Administrator' : (Auth::user()->level == 1 ? 'Pegawai' : 'Donatur') }}
+                    </p>
+                </div>
+                <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+            </button>
+        </div>
+    </div>
 </div>

@@ -15,7 +15,7 @@ class CampaignController extends Controller
 {
     public function index($slug)
     {
-        $campaign = Campaign::where('slug_campaign', $slug)->first();
+        $campaign = Campaign::where('slug_campaign', $slug)->firstOrFail();
         $berita = Berita::where('campaign_id', $campaign->id)->latest()->get();
         $doa = Transaksi::with('user')->where('campaign_id', $campaign->id)->where('status_transaksi', 1)->limit(3)->latest()->get();
         if ($campaign->status_campaign == 1) {
@@ -43,6 +43,15 @@ class CampaignController extends Controller
         }
     }
 
+    public function allCampaigns()
+    {
+        $campaign = Campaign::where('status_campaign', 1)->latest()->get();
+        return view('landing.allcampaign', [
+            'campaign'  => $campaign,
+            'title' => 'Semua Program - We Care',
+        ]);
+    }
+
     public function campaign()
     {
         $campaign = Campaign::all();
@@ -50,6 +59,44 @@ class CampaignController extends Controller
             'campaign'  => $campaign,
             'title' => 'Data Campaign - We Care',
         ]);
+    }
+
+    public function create()
+    {
+        $kategori = Kategori::all();
+        return view('admin.tambahcampaign', [
+            'title' => 'Tambah Campaign - We Care',
+            'kategori' => $kategori
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $valid = $request->validate([
+            'judul_campaign' => 'required',
+            'category_id' => 'required',
+            'target_campaign' => 'required',
+            'tgl_akhir_campaign' => 'required',
+            'deskripsi_campaign' => 'required',
+            'foto_campaign' => 'required|image'
+        ]);
+
+        Campaign::create([
+            'user_id' => Auth::user()->id,
+            'category_id' => $request->category_id,
+            'foto_campaign' => $request->file('foto_campaign')->store('images/campaign', 'public'),
+            'judul_campaign' => $request->judul_campaign,
+            // 'nama_inisiator' => Auth::user()->name, 
+            'deskripsi_campaign' => $request->deskripsi_campaign,
+            'slug_campaign' => str()->slug($request['judul_campaign']),
+            'tgl_mulai_campaign' => Carbon::now(),
+            'tgl_akhir_campaign' => $request->tgl_akhir_campaign,
+            'target_campaign' => str_replace(['Rp', '.', ','], '', $request->target_campaign),
+            'dana_terkumpul' => 0,
+            'status_campaign' => 1, 
+        ]);
+
+        return redirect('/admin/campaign/campaign')->with('message', 'Campaign berhasil ditambahkan');
     }
 
     public function lihatcampaign($id)

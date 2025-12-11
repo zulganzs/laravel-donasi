@@ -164,7 +164,7 @@
     </section>
 
     <!-- Urgent Campaigns Carousel -->
-    <section class="py-16 bg-gray-50">
+    <section id="campaign" class="py-16 bg-gray-50">
         <div class="container mx-auto px-4 max-w-6xl">
             <div class="flex items-center justify-between mb-8">
                 <h5 class="text-2xl font-bold text-gray-800">Penggalangan Dana Mendesak</h5>

@@ -32,22 +32,32 @@ class TransaksiController extends Controller
     }
 
 
-    public function create(Request $request)
+    public function create(Request $request, $id)
     {
         $nominal = (int) str_replace(['Rp', '.', ','], '', $request->input('nominal'));
         if ($request->isMethod('post')) {
+            $nama = $request->nama;
+            if ($request->has('anonim')) {
+                $nama = 'Orang Baik';
+            }
+
             $transaksi = Transaksi::create([
                 'user_id' => $request->user_id,
-                'campaign_id' => $request->campaign_id,
+                'campaign_id' => $id,
                 'nominal_transaksi' => $nominal,
-                'nama' => $request->nama,
+                'nama' => $nama,
                 'tgl_transaksi' => Carbon::now(),
-                'keterangan' => $request->pesan,
-                'status_transaksi' => 0,
+                'keterangan' => empty($request->pesan) ? 'Doa dari Orang Baik' : $request->pesan,
+                'status_transaksi' => 1, // Set to 1 (paid) for demo purposes
             ]);
-            $id = $transaksi->id;
+            $transaksiId = $transaksi->id;
 
-            return redirect('/checkout/' . $id)->with('success', 'Donasi berhasil dilakukan');
+            // Update dana terkumpul for the campaign
+            $campaign = Campaign::findOrFail($id);
+            $campaign->dana_terkumpul += $nominal;
+            $campaign->save();
+
+            return redirect('/checkout/' . $transaksiId)->with('success', 'Donasi berhasil dilakukan');
         }
         return view('/');
     }
@@ -90,8 +100,16 @@ class TransaksiController extends Controller
         // Render checkout page with Snap Token
         // return view('checkout', compact('snapToken'));
 
-        return view('landing.checkout', [
+        return view('landing.payment', [
             'transaksi' => $transaksi,
+            'campaign' => $campaign,
+        ]);
+    }
+
+    public function donateForm($slug)
+    {
+        $campaign = Campaign::where('slug_campaign', $slug)->firstOrFail();
+        return view('landing.checkout', [
             'campaign' => $campaign,
         ]);
     }

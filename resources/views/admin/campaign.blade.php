@@ -7,6 +7,13 @@
                 <h3 class="text-2xl font-bold text-gray-800">Data Campaign</h3>
                 <p class="text-gray-500 mt-1">Kelola dan verifikasi campaign donasi.</p>
             </div>
+            <a href="{{ route('admin.campaign.create') }}" 
+               class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors duration-150 shadow-sm">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Tambah Kampanye
+            </a>
         </div>
 
         @if (session()->has('message'))
@@ -44,6 +51,7 @@
                             <th class="px-6 py-4">Kategori</th>
                             <th class="px-6 py-4">Penggalang Dana</th>
                             <th class="px-6 py-4">Periode</th>
+                            <th class="px-6 py-4">Dana Terkumpul</th>
                             <th class="px-6 py-4">Status</th>
                             <th class="px-6 py-4">Tindakan</th>
                         </tr>
@@ -65,6 +73,7 @@
                                     <div class="font-medium text-gray-800">{{ $item->tgl_mulai_campaign }}</div>
                                     <div class="text-gray-400">s/d {{ $item->tgl_akhir_campaign }}</div>
                                 </td>
+                                <td class="px-6 py-4 font-bold text-gray-700">Rp {{ number_format($item->dana_terkumpul, 0, ',', '.') }}</td>
                                 <td class="px-6 py-4">
                                     @if ($item->status_campaign == 0)
                                         <span class="px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">Pending</span>

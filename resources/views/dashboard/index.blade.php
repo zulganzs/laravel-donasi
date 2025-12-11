@@ -14,7 +14,7 @@
                     <p class="text-primary-100 text-lg max-w-xl">Siap berbagi kebaikan hari ini? Setiap rupiah yang Anda donasikan membawa harapan baru bagi mereka yang membutuhkan.</p>
                     
                     <div class="mt-8 flex flex-wrap gap-4">
-                        <a href="{{ url('/') }}#campaign" class="bg-white text-primary-700 font-bold py-3 px-8 rounded-xl shadow-md hover:bg-primary-50 hover:scale-105 transition-all duration-300 transform">
+                        <a href="{{ url('/all-campaigns') }}" class="bg-white text-primary-700 font-bold py-3 px-8 rounded-xl shadow-md hover:bg-primary-50 hover:scale-105 transition-all duration-300 transform">
                             Donasi Sekarang
                         </a>
                         <a href="{{ url('/') }}#campaign" class="bg-transparent border-2 border-primary-200 text-white font-semibold py-3 px-8 rounded-xl hover:bg-white/10 transition-all duration-300">
@@ -68,7 +68,7 @@
     @endauth
 
     <!-- Featured Categories -->
-    <div class="mb-10">
+    <div id="campaign" class="mb-10">
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold text-gray-800">Program Pilihan</h2>
             <a href="{{ url('/') }}#campaign" class="text-primary-600 font-medium hover:text-primary-700 hover:underline">Lihat Semua</a>
